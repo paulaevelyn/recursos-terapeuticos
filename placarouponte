@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Placar ou ponte: uma pausa antes de responder</title>
+<!--
+PUBLICAÇÃO (padrão do projeto)
+1. Repositório recursos-terapeuticos, pasta placar-ou-ponte/, arquivo index.html (este arquivo renomeado).
+2. GitHub Pages: https://paulaevelyn.github.io/recursos-terapeuticos/placar-ou-ponte/
+3. WordPress, bloco HTML personalizado:
+
+<iframe id="pea-placar-ponte" src="https://paulaevelyn.github.io/recursos-terapeuticos/placar-ou-ponte/" title="Placar ou ponte: uma pausa antes de responder" loading="lazy" style="width:100%;min-height:640px;border:0"></iframe>
+<script>
+window.addEventListener('message', function (e) {
+  if (e.origin !== 'https://paulaevelyn.github.io') return;
+  var f = document.getElementById('pea-placar-ponte');
+  if (!f || !e.data) return;
+  if (e.data.type === 'pea-resize') f.style.height = e.data.height + 'px';
+  if (e.data.type === 'pea-top') f.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+</script>
+
+Se o seu iframe padrão usa outro nome de mensagem para o auto-resize, troque 'pea-resize' (aqui e na função postHeight abaixo).
+As respostas ficam apenas no navegador da pessoa (localStorage). Nada é enviado a servidor.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --text:#333333;
+  --green:#72A580;
+  --green-soft:#eef5f0;
+  --teal:#1b8b6f;
+  --coral:#E97B3A;
+  --coral-soft:#fdf0e8;
+  --lav:#aeaaf7;
+  --lav-soft:#f1f0fe;
+  --dark:#23423a;
+  --line:#e3e3e3;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#fff;color:var(--text);font-family:'Poppins',system-ui,-apple-system,'Segoe UI',sans-serif;font-size:16px;line-height:1.65}
+.wrap{max-width:640px;margin:0 auto;padding:20px 16px 32px}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.brand{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);font-weight:600}
+.progress{height:6px;background:#e9efe9;border-radius:99px;overflow:hidden;margin:10px 0 6px}
+.progress>i{display:block;height:100%;background:var(--green);width:0;transition:width .3s}
+.part{font-size:.8rem;color:#666;margin:0 0 16px;min-height:1.2em}
+h1,h2,h3{font-family:'Playfair Display',Georgia,serif;line-height:1.25;color:var(--text)}
+h1{font-size:2rem;margin:0 0 .3em}
+h2{font-size:1.4rem;margin:0 0 .7em}
+h3{font-size:1.1rem;margin:1.2em 0 .3em}
+h1:focus,h2:focus{outline:none}
+p{margin:0 0 1em}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px 20px}
+.eyebrow{display:inline-block;font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin:0 0 .4rem}
+.lead{font-size:1.05rem}
+.goals{margin:0 0 1em;padding:0;list-style:none}
+.goals li{position:relative;padding:.35em 0 .35em 2em}
+.goals li::before{content:'';position:absolute;left:.3em;top:.9em;width:.7em;height:.7em;border-radius:50%;background:var(--green)}
+.note{background:var(--green-soft);border-left:5px solid var(--green);border-radius:0 14px 14px 0;padding:.9em 1.1em;margin:0 0 1em;font-size:.95rem}
+.note p:last-child{margin:0}
+.hint{font-size:.9rem;color:#555;background:var(--lav-soft);border-radius:12px;padding:.7em 1em;margin:0 0 1em}
+.q{font-size:1.3rem;margin:0 0 1em}
+
+/* escala */
+.scale{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;border:0;padding:0;margin:0 0 1em}
+.opt{position:relative;display:block}
+.opt input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
+.opt span{display:block;text-align:center;padding:.85em .3em;border:1.5px solid #cfd8d1;border-radius:12px;font-size:.9rem;background:#fff;pointer-events:none}
+.opt input:checked + span{background:var(--green-soft);border-color:var(--teal);font-weight:600}
+.opt input:focus-visible + span{outline:3px solid var(--teal);outline-offset:2px}
+.list{display:grid;gap:8px;margin:0 0 1em;border:0;padding:0}
+.list .opt span{text-align:left;padding:.8em 1em}
+
+/* botões */
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:1.2em}
+.btn{font-family:inherit;font-size:1rem;font-weight:600;border-radius:999px;padding:.7em 1.5em;line-height:1.3;cursor:pointer;border:2px solid transparent}
+.btn.primary{background:var(--coral);color:#2b2118}
+.btn.ghost{background:#fff;color:var(--teal);border-color:var(--teal)}
+.btn:hover:not(:disabled){filter:brightness(.96)}
+.btn:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.small{font-size:.9rem;padding:.5em 1.1em}
+.row{display:flex;flex-wrap:wrap;gap:10px;margin:1em 0 0}
+
+/* medidor placar x ponte */
+.gauge{position:relative;height:16px;border-radius:99px;background:linear-gradient(90deg,var(--green),#ece6c9 50%,var(--coral));margin:26px 4px 8px}
+.marker{position:absolute;top:-7px;width:30px;height:30px;margin-left:-15px;border-radius:50%;background:#fff;border:4px solid var(--dark);box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.gl{display:flex;justify-content:space-between;font-size:.8rem;font-weight:600;color:#555;margin:0 0 1.2em}
+
+/* barras de motivação */
+.bars{display:grid;gap:14px;margin:0 0 1.2em}
+.bl{display:flex;justify-content:space-between;font-weight:600;font-size:.95rem;margin-bottom:4px}
+.bl small{font-weight:400;color:#666}
+.bar{height:14px;background:#eceff0;border-radius:99px;overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:99px}
+.b-p{background:var(--coral)}
+.b-c{background:var(--lav)}
+.b-u{background:var(--green)}
+.tag{display:inline-block;font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:var(--dark);color:#fff;border-radius:99px;padding:.15em .7em;margin-left:.5em;vertical-align:middle}
+
+/* respiração */
+.breath{width:150px;height:150px;border-radius:50%;background:var(--lav-soft);border:4px solid var(--lav);margin:22px auto 8px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:.9rem;padding:14px;transition:transform 4s ease-in-out}
+.bcnt{text-align:center;font-size:.85rem;color:#666;margin:0 0 .8em;min-height:1.4em}
+.center{text-align:center}
+
+/* texto livre */
+textarea{width:100%;font-family:inherit;font-size:1rem;border:1.5px solid #cfd8d1;border-radius:12px;padding:.7em .9em;min-height:90px;resize:vertical;color:var(--text)}
+textarea:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+
+/* resumo */
+.sum{margin:0 0 1em}
+.sum dt{font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#666;margin-top:.9em}
+.sum dd{margin:.1em 0 0}
+.tasks{display:grid;gap:8px;margin:.6em 0 1em}
+.task{display:flex;gap:.7em;align-items:flex-start;background:var(--coral-soft);border-radius:12px;padding:.7em .9em;cursor:pointer}
+.task input{margin-top:.35em;width:1.1em;height:1.1em;accent-color:var(--teal)}
+.dark{background:var(--dark);color:#fff;border-radius:16px;padding:1.1em 1.2em;margin-top:1.4em;font-size:.92rem}
+.dark p{margin:0 0 .5em;color:#f2f2f2}
+.dark p:last-child{margin:0}
+.dark a{color:var(--lav)}
+.foot{font-size:.78rem;color:#666;margin-top:1.4em;line-height:1.55}
+.foot a{color:var(--teal)}
+.toast{font-size:.85rem;color:var(--teal);min-height:1.3em;margin-top:.6em}
+
+@media (max-width:520px){
+  h1{font-size:1.7rem}
+  .scale{grid-template-columns:1fr 1fr}
+  .nav{flex-direction:column-reverse}
+  .nav .btn{width:100%}
+  .card{padding:18px 16px}
+}
+@media (prefers-reduced-motion:reduce){
+  .breath,.progress>i{transition:none}
+}
+@media print{
+  .nav,.progress,.part,.no-print,.brand{display:none!important}
+  .card{border:0;padding:0}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">Psicoterapia e Afins</div>
+  <div class="progress" role="progressbar" aria-label="Progresso" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="bar"></i></div>
+  <p class="part" id="part"></p>
+  <main id="app" class="card">
+    <noscript>Esta ferramenta precisa de JavaScript para funcionar.</noscript>
+  </main>
+  <p class="foot">Ferramenta de reflexão psicoeducativa. Não é um teste psicológico, não avalia suas opiniões e não substitui acompanhamento profissional. Suas respostas ficam apenas neste navegador.</p>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var KEY = 'pea_placar_ponte_v1';
+  var SCALE = ['Nada', 'Um pouco', 'Bastante', 'Muito'];
+
+  /* ---------- conteúdo ---------- */
+  var P1 = [
+    { id: 'a1', kind: 'placar', text: 'Meu corpo está em alerta: mandíbula travada, respiração curta, calor no rosto.' },
+    { id: 'a2', kind: 'placar', text: 'Já tenho uma resposta pronta e estou ouvindo pouco o que a outra pessoa diz.' },
+    { id: 'b1', kind: 'ponte', text: 'Estou curioso para entender como a outra pessoa chegou a essa opinião.' },
+    { id: 'a3', kind: 'placar', text: 'O que eu mais quero agora é provar que estou certo ou fazer o outro se calar.' },
+    { id: 'b2', kind: 'ponte', text: 'Consigo lembrar que, do outro lado, existe uma pessoa que eu respeito.' }
+  ];
+
+  var P2 = [
+    { id: 'm1', sys: 'proteger',  text: 'Penso mais no que pode ser perdido ou dar errado do que no que pode melhorar.' },
+    { id: 'm2', sys: 'conquistar', text: 'Me motiva imaginar o que posso construir e alcançar nos próximos anos.' },
+    { id: 'm3', sys: 'cuidar',    text: 'Penso em pessoas específicas que precisam de cuidado ou de proteção, como a família, a comunidade ou quem está mais vulnerável.' },
+    { id: 'm4', sys: 'proteger',  text: 'Sinto que, se o resultado for outro, algo importante para mim ou para quem eu amo pode ficar ameaçado.' },
+    { id: 'm5', sys: 'conquistar', text: 'Minha escolha tem a ver com ver minha vida, meu trabalho ou meu grupo avançar e prosperar.' },
+    { id: 'm6', sys: 'cuidar',    text: 'Minha escolha me aproxima de pessoas e de um grupo em que me sinto acolhido.' },
+    { id: 'm7', sys: 'proteger',  text: 'Acompanhar notícias sobre isso me deixa em alerta e com dificuldade de relaxar.' },
+    { id: 'm8', sys: 'conquistar', text: 'Me anima pensar em oportunidades novas, para mim ou para as pessoas que estão comigo.' },
+    { id: 'm9', sys: 'cuidar',    text: 'Quero viver em um lugar onde as pessoas cuidem umas das outras.' }
+  ];
+
+  var BRIDGE_Q = {
+    q1: 'O que você mais teme perder nesse cenário?',
+    q2: 'O que você espera construir ou conquistar com isso?',
+    q3: 'Quem você está tentando cuidar quando pensa assim?',
+    q4: 'O que é mais importante para você nisso tudo?',
+    q5: 'Hoje eu prefiro não responder, e tudo bem.'
+  };
+
+  var steps = [{ t: 'intro' }];
+  P1.forEach(function (i, k) { steps.push({ t: 'q', part: 1, item: i, n: k + 1, total: P1.length }); });
+  steps.push({ t: 'gauge' });
+  P2.forEach(function (i, k) { steps.push({ t: 'q', part: 2, item: i, n: k + 1, total: P2.length }); });
+  steps.push({ t: 'motiv' }, { t: 'combo' }, { t: 'pause' }, { t: 'bridge' }, { t: 'card' });
+
+  /* ---------- estado ---------- */
+  var state = { step: 0, ans: {}, pause: null, bridgeQ: null, bridgeText: '', tasks: [false, false, false] };
+  var resumeAt = 0;
+  var app = document.getElementById('app');
+  var barEl = document.getElementById('bar');
+  var partEl = document.getElementById('part');
+  var progEl = document.querySelector('.progress');
+
+  function load() {
+    try {
+      var s = window.localStorage.getItem(KEY);
+      if (!s) return;
+      var o = JSON.parse(s);
+      if (o && typeof o === 'object') {
+        state.step = Math.min(Math.max(+o.step || 0, 0), steps.length - 1);
+        state.ans = o.ans || {};
+        state.pause = o.pause || null;
+        state.bridgeQ = o.bridgeQ || null;
+        state.bridgeText = typeof o.bridgeText === 'string' ? o.bridgeText : '';
+        state.tasks = Array.isArray(o.tasks) && o.tasks.length === 3 ? o.tasks : [false, false, false];
+        if (state.step > 0) { resumeAt = state.step; state.step = 0; }
+      }
+    } catch (e) {}
+  }
+  function save() {
+    try { window.localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+  }
+  function resetAll() {
+    state = { step: 0, ans: {}, pause: null, bridgeQ: null, bridgeText: '', tasks: [false, false, false] };
+    resumeAt = 0;
+    save();
+  }
+
+  /* ---------- utilidades ---------- */
+  function $(sel) { return app.querySelector(sel); }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function postHeight() {
+    try {
+      var h = Math.ceil(document.documentElement.scrollHeight);
+      window.parent.postMessage({ type: 'pea-resize', height: h, tool: 'placar-ou-ponte' }, '*');
+    } catch (e) {}
+  }
+  function postTop() {
+    try { window.parent.postMessage({ type: 'pea-top', tool: 'placar-ou-ponte' }, '*'); } catch (e) {}
+  }
+
+  /* ---------- cálculos ---------- */
+  function placarScore() {
+    var s = 0;
+    P1.forEach(function (i) {
+      var v = state.ans[i.id];
+      if (v == null) v = 0;
+      s += i.kind === 'placar' ? v : 3 - v;
+    });
+    return { score: s, max: P1.length * 3 };
+  }
+  function band() {
+    var r = placarScore();
+    var idx = r.score / r.max;
+    return idx <= 0.33 ? 'ponte' : idx <= 0.66 ? 'misto' : 'placar';
+  }
+  function motivScores() {
+    var o = { proteger: 0, conquistar: 0, cuidar: 0 };
+    P2.forEach(function (i) { o[i.sys] += state.ans[i.id] || 0; });
+    return o;
+  }
+  function topMotiv() {
+    var sc = motivScores();
+    var keys = Object.keys(sc).sort(function (a, b) { return sc[b] - sc[a]; });
+    var diff = sc[keys[0]] - sc[keys[1]];
+    return { sc: sc, top: diff <= 1 ? 'misto' : keys[0], ranked: keys };
+  }
+  var MOTIV_LABEL = { proteger: 'Proteger', conquistar: 'Conquistar', cuidar: 'Cuidar e pertencer', misto: 'Mais de uma, com peso parecido' };
+  var BAND_LABEL = { ponte: 'Ponte mais presente', misto: 'Um pouco de placar e um pouco de ponte', placar: 'Placar bem ligado' };
+  var PAUSE_LABEL = { solto: 'Um pouco mais solto', igual: 'Igual', tenso: 'Mais tenso' };
+
+  /* ---------- telas ---------- */
+  function navHTML(opts) {
+    opts = opts || {};
+    var back = state.step > 0 ? '<button type="button" class="btn ghost" id="back">Voltar</button>' : '<span></span>';
+    var next = '<button type="button" class="btn primary" id="next"' + (opts.disabled ? ' disabled' : '') + '>' + (opts.label || 'Continuar') + '</button>';
+    return '<div class="nav no-print">' + back + next + '</div>';
+  }
+
+  function introHTML() {
+    var html =
+      '<span class="eyebrow">Ferramenta interativa</span>' +
+      '<h1 tabindex="-1" data-focus>Placar ou ponte</h1>' +
+      '<p class="lead">Uma pausa de poucos minutos antes de responder uma mensagem ou entrar em uma discussão política.</p>' +
+      '<h3>Ao final, você vai conseguir</h3>' +
+      '<ul class="goals">' +
+      '<li>Reconhecer em que modo você está agora: <strong>placar</strong> (quero vencer) ou <strong>ponte</strong> (quero entender).</li>' +
+      '<li>Nomear o que move a sua escolha: <strong>proteger, conquistar ou cuidar</strong>.</li>' +
+      '<li>Escolher como responder, e se vai responder agora.</li>' +
+      '</ul>' +
+      '<div class="note"><p>Leva cerca de 5 minutos. Esta ferramenta não diz em quem votar e não avalia suas opiniões. Ela olha para o seu estado emocional e para as suas motivações, que existem em todos os lados.</p></div>' +
+      '<div class="nav no-print"><span></span><button type="button" class="btn primary" id="next">Começar</button></div>';
+    if (resumeAt > 0) {
+      html += '<div class="row no-print"><button type="button" class="btn ghost small" id="resume">Continuar de onde parei</button><button type="button" class="btn ghost small" id="fresh">Apagar respostas e recomeçar</button></div>';
+    }
+    return html;
+  }
+
+  function qHTML(s) {
+    var i = s.item, v = state.ans[i.id];
+    var hint = '';
+    if (s.n === 1 && s.part === 1) hint = '<p class="hint">Pense na conversa ou na mensagem política que está te mobilizando agora. Se não houver nenhuma, pense na última que te mobilizou.</p>';
+    if (s.n === 1 && s.part === 2) hint = '<p class="hint">Agora pense na sua escolha política, e não na discussão. Marque o quanto cada frase descreve você. Não há resposta certa.</p>';
+    var opts = SCALE.map(function (l, k) {
+      return '<label class="opt"><input type="radio" name="q" value="' + k + '"' + (v === k ? ' checked' : '') + '><span>' + l + '</span></label>';
+    }).join('');
+    return hint +
+      '<h2 class="q" id="qh" tabindex="-1" data-focus>' + esc(i.text) + '</h2>' +
+      '<fieldset class="scale" aria-labelledby="qh"><legend class="sr">Quanto isso descreve você agora?</legend>' + opts + '</fieldset>' +
+      '<p class="sr">Você também pode usar as teclas 1 a 4.</p>' +
+      navHTML({ disabled: v == null });
+  }
+
+  function gaugeHTML() {
+    var r = placarScore();
+    var idx = r.score / r.max;
+    var pos = Math.min(96, Math.max(4, idx * 100));
+    var b = band();
+    var txt = {
+      ponte: 'Neste momento, a ponte está mais acessível. Você parece ter espaço para ouvir. Se a conversa esquentar, vale voltar aqui.',
+      misto: 'Há um pouco de placar e um pouco de ponte, o que é muito comum. Uma pausa curta pode inclinar a balança.',
+      placar: 'O modo placar está bem ligado agora. Isso não é defeito: é o corpo tentando proteger você. Antes de responder, vale fazer uma pausa.'
+    }[b];
+    return '<span class="eyebrow">Como você está agora</span>' +
+      '<h2 tabindex="-1" data-focus>' + BAND_LABEL[b] + '</h2>' +
+      '<div class="gauge" role="img" aria-label="Medidor entre ponte e placar: ' + BAND_LABEL[b] + '"><div class="marker" style="left:' + pos.toFixed(0) + '%"></div></div>' +
+      '<div class="gl" aria-hidden="true"><span>Ponte</span><span>Placar</span></div>' +
+      '<p>' + txt + '</p>' +
+      '<div class="note"><p>Este resultado vale para agora. Daqui a uma hora, ou depois de uma pausa, pode ser outro. Modos não são tipos de pessoa nem lados políticos.</p></div>' +
+      '<p>Na próxima parte, vamos olhar para o que move a sua escolha.</p>' +
+      navHTML();
+  }
+
+  function motivHTML() {
+    var m = topMotiv();
+    var sc = m.sc;
+    var defs = [
+      { k: 'proteger', cls: 'b-p', name: 'Proteger' },
+      { k: 'conquistar', cls: 'b-c', name: 'Conquistar' },
+      { k: 'cuidar', cls: 'b-u', name: 'Cuidar e pertencer' }
+    ];
+    var bars = defs.map(function (d) {
+      var isTop = m.top === d.k;
+      return '<div><div class="bl"><span>' + d.name + (isTop ? '<span class="tag">mais presente</span>' : '') + '</span><small>' + sc[d.k] + ' de 9</small></div>' +
+        '<div class="bar" aria-hidden="true"><i class="' + d.cls + '" style="width:' + Math.round(sc[d.k] / 9 * 100) + '%"></i></div></div>';
+    }).join('');
+    var texts = {
+      proteger: 'Seu foco está em evitar perdas e se proteger. Essa é uma função legítima da mente, e ameaças reais existem. A pergunta útil é: <strong>o que o meu medo está tentando proteger?</strong> Quando a ameaça é sentida como total, no formato “se o outro lado ganhar, perco tudo”, o modo placar tende a ligar com mais força.',
+      conquistar: 'Seu foco está em chegar a algo: crescer, construir, prosperar. Essa energia é valiosa. O risco aparece quando a busca vira disputa pura, em que só importa vencer. Vale perguntar: <strong>o que eu quero construir, e com quem?</strong>',
+      cuidar: 'Seu foco está em cuidar de pessoas e em pertencer. Isso dá sentido e força. O risco é o grupo virar a única fonte de acolhimento, de modo que discordar pareça traição. Vale perguntar: <strong>posso cuidar sem precisar que o outro lado seja inimigo?</strong>',
+      misto: 'Mais de uma motivação aparece com força, o que é o mais comum. Observe qual delas surge primeiro no corpo quando você pensa no assunto: ela costuma ser a que mais pesa nas reações.'
+    };
+    return '<span class="eyebrow">O que move a sua escolha</span>' +
+      '<h2 tabindex="-1" data-focus>' + (m.top === 'misto' ? MOTIV_LABEL.misto : MOTIV_LABEL[m.top]) + '</h2>' +
+      '<div class="bars">' + bars + '</div>' +
+      '<p>' + texts[m.top] + '</p>' +
+      '<div class="note"><p>Nenhuma dessas motivações pertence a um lado político. Todos os lados têm gente movida por medo, por busca e por cuidado. Medo nem sempre é distorção: é um sinal, e vale entender do que ele fala.</p></div>' +
+      navHTML();
+  }
+
+  function comboHTML() {
+    var b = band();
+    var m = topMotiv();
+    var high = b === 'placar';
+    var threat = m.sc.proteger >= 6;
+    var title, txt;
+    if (high && threat) {
+      title = 'Medo e placar estão juntos';
+      txt = 'É a combinação em que as discussões mais escalam. A mente está tentando se proteger e vencer ao mesmo tempo. Priorize a pausa, e considere não responder agora.';
+    } else if (high && !threat) {
+      title = 'O placar está ligado, com pouco medo por trás';
+      txt = 'Pode ser vontade de provar, de ganhar espaço ou de ter razão. Vale perguntar se isso compensa o custo para a relação.';
+    } else if (!high && threat) {
+      title = 'Há medo, mas a ponte está acessível';
+      txt = 'Este pode ser um bom momento para conversar, com um limite claro de tempo e de assunto. Nomear o medo em voz alta costuma baixar a temperatura.';
+    } else {
+      title = 'Você parece ter espaço para conversar';
+      txt = 'Use perguntas de curiosidade, e preste atenção ao corpo. Se o placar ligar no meio da conversa, volte a esta pausa.';
+    }
+    return '<span class="eyebrow">Parte 3 · O que fazer agora</span>' +
+      '<h2 tabindex="-1" data-focus>' + title + '</h2>' +
+      '<p>' + txt + '</p>' +
+      '<div class="note"><p>Isto é uma leitura do momento, e não um diagnóstico nem uma previsão sobre você.</p></div>' +
+      '<p>A seguir, uma pausa de cerca de 1 minuto para o corpo, e depois a escolha de como responder.</p>' +
+      navHTML();
+  }
+
+  function pauseHTML() {
+    var after = state.pause
+      ? ''
+      : ' hidden';
+    function chk(v) { return state.pause === v ? ' checked' : ''; }
+    return '<span class="eyebrow">Pausa de 1 minuto</span>' +
+      '<h2 tabindex="-1" data-focus>Respire com a expiração mais longa</h2>' +
+      '<p>Inspire pelo nariz por 4 segundos e solte o ar devagar por 6. A expiração mais longa ajuda o corpo a sair do modo defesa. Faça 5 ciclos.</p>' +
+      '<div class="breath" id="circ" aria-hidden="true"><span id="blab">Quando quiser, comece</span></div>' +
+      '<p class="bcnt" id="bcnt" role="status"></p>' +
+      '<div class="center no-print"><button type="button" class="btn ghost small" id="bstart">Começar a pausa</button></div>' +
+      '<div id="after"' + after + '>' +
+      '<h3>Como está o seu corpo agora?</h3>' +
+      '<fieldset class="list" aria-label="Como está o seu corpo agora?">' +
+      '<label class="opt"><input type="radio" name="pz" value="solto"' + chk('solto') + '><span>Um pouco mais solto</span></label>' +
+      '<label class="opt"><input type="radio" name="pz" value="igual"' + chk('igual') + '><span>Igual</span></label>' +
+      '<label class="opt"><input type="radio" name="pz" value="tenso"' + chk('tenso') + '><span>Mais tenso</span></label>' +
+      '</fieldset></div>' +
+      '<p class="hint">Se preferir, você pode seguir sem fazer a pausa agora. Ela fica disponível sempre que você voltar.</p>' +
+      navHTML();
+  }
+
+  function recommended() {
+    var t = topMotiv().top;
+    return t === 'proteger' ? 'q1' : t === 'conquistar' ? 'q2' : t === 'cuidar' ? 'q3' : 'q4';
+  }
+
+  function bridgeHTML() {
+    if (!state.bridgeQ) state.bridgeQ = recommended();
+    var rec = recommended();
+    var opts = Object.keys(BRIDGE_Q).map(function (k) {
+      return '<label class="opt"><input type="radio" name="bq" value="' + k + '"' + (state.bridgeQ === k ? ' checked' : '') + '><span>' + esc(BRIDGE_Q[k]) + (k === rec ? '<span class="tag">sugerida</span>' : '') + '</span></label>';
+    }).join('');
+    return '<span class="eyebrow">Escolha como responder</span>' +
+      '<h2 tabindex="-1" data-focus>Uma pergunta de ponte</h2>' +
+      '<p>Perguntar antes de afirmar costuma abrir mais do que um bom argumento. A sugestão abaixo vem da motivação que mais apareceu para você, e você pode trocar.</p>' +
+      '<fieldset class="list" aria-label="Escolha uma pergunta de ponte">' + opts + '</fieldset>' +
+      '<label for="bt"><strong>Sua frase de abertura (opcional)</strong></label>' +
+      '<textarea id="bt" maxlength="400" placeholder="Ex.: Antes de responder, quero entender o que te preocupa nisso.">' + esc(state.bridgeText) + '</textarea>' +
+      '<p class="hint" style="margin-top:.8em">O que você escreve aqui fica só no seu navegador.</p>' +
+      navHTML({ label: 'Ver meu resumo' });
+  }
+
+  function summaryData() {
+    var m = topMotiv();
+    return {
+      modo: BAND_LABEL[band()],
+      motiv: MOTIV_LABEL[m.top],
+      pausa: state.pause ? PAUSE_LABEL[state.pause] : 'Não registrada',
+      pergunta: BRIDGE_Q[state.bridgeQ || recommended()],
+      frase: state.bridgeText.trim()
+    };
+  }
+  function summaryText() {
+    var d = summaryData();
+    return 'Placar ou ponte: meu resumo de hoje\n' +
+      'Modo agora: ' + d.modo + '\n' +
+      'O que mais move minha escolha: ' + d.motiv + '\n' +
+      'Corpo depois da pausa: ' + d.pausa + '\n' +
+      'Pergunta que escolhi: ' + d.pergunta + '\n' +
+      (d.frase ? 'Minha frase: ' + d.frase + '\n' : '') +
+      'Psicoterapia e Afins, psicoterapiaeafins.com.br';
+  }
+
+  function cardHTML() {
+    var d = summaryData();
+    var taskText = ['Fiz uma pausa de corpo antes de responder.', 'Nomeei meu modo e minha motivação em uma frase.', 'Escolhi entre responder agora, responder depois ou não responder.'];
+    var tasks = taskText.map(function (t, k) {
+      return '<label class="task"><input type="checkbox" data-task="' + k + '"' + (state.tasks[k] ? ' checked' : '') + '><span>' + t + '</span></label>';
+    }).join('');
+    return '<span class="eyebrow">Seu resumo de hoje</span>' +
+      '<h2 tabindex="-1" data-focus>Você escolhe como responder</h2>' +
+      '<dl class="sum">' +
+      '<dt>Modo agora</dt><dd>' + esc(d.modo) + '</dd>' +
+      '<dt>O que mais move a sua escolha</dt><dd>' + esc(d.motiv) + '</dd>' +
+      '<dt>Corpo depois da pausa</dt><dd>' + esc(d.pausa) + '</dd>' +
+      '<dt>Pergunta que você escolheu</dt><dd>' + esc(d.pergunta) + '</dd>' +
+      (d.frase ? '<dt>Sua frase</dt><dd>' + esc(d.frase) + '</dd>' : '') +
+      '</dl>' +
+      '<h3>Tarefa da semana</h3>' +
+      '<p>Repita este passo a passo em pelo menos 3 situações em que uma conversa política mobilizar você, e anote o que mudou. Hoje, marque o que já fez:</p>' +
+      '<div class="tasks">' + tasks + '</div>' +
+      '<div class="row no-print">' +
+      '<button type="button" class="btn primary small" id="copy">Copiar resumo</button>' +
+      '<button type="button" class="btn ghost small" id="print">Imprimir</button>' +
+      '<button type="button" class="btn ghost small" id="restart">Recomeçar</button>' +
+      '</div>' +
+      '<p class="toast" id="toast" role="status"></p>' +
+      '<div class="dark no-print">' +
+      '<p><strong>Se a ansiedade estiver intensa ou persistente,</strong> vale conversar com um profissional. Se você estiver em sofrimento agudo, no Brasil ligue para o CVV, 188, e na Espanha para o 024.</p>' +
+      '<p><a href="https://wa.me/5581997153967" target="_blank" rel="noopener">Falar sobre atendimento</a> · <a href="https://psicoterapiaeafins.com.br" target="_blank" rel="noopener">psicoterapiaeafins.com.br</a></p>' +
+      '</div>' +
+      '<div class="nav no-print"><button type="button" class="btn ghost" id="back">Voltar</button><span></span></div>';
+  }
+
+  /* ---------- respiração ---------- */
+  var breathTimer = null, breathToken = 0;
+  function clearBreath() {
+    breathToken++;
+    if (breathTimer) { clearTimeout(breathTimer); breathTimer = null; }
+  }
+  function startBreath() {
+    clearBreath();
+    var token = breathToken;
+    var cycles = 5, c = 0;
+    var circ = $('#circ'), lab = $('#blab'), cnt = $('#bcnt'), btn = $('#bstart'), after = $('#after');
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    btn.disabled = true;
+    function inhale() {
+      if (token !== breathToken) return;
+      c++;
+      cnt.textContent = 'Ciclo ' + c + ' de ' + cycles;
+      lab.textContent = 'Inspire pelo nariz';
+      if (!reduce) { circ.style.transitionDuration = '4s'; circ.style.transform = 'scale(1.3)'; }
+      breathTimer = setTimeout(exhale, 4000);
+    }
+    function exhale() {
+      if (token !== breathToken) return;
+      lab.textContent = 'Solte o ar devagar';
+      if (!reduce) { circ.style.transitionDuration = '6s'; circ.style.transform = 'scale(0.85)'; }
+      breathTimer = setTimeout(function () { if (c >= cycles) done(); else inhale(); }, 6000);
+    }
+    function done() {
+      if (token !== breathToken) return;
+      lab.textContent = 'Pronto';
+      cnt.textContent = 'Pausa concluída';
+      btn.disabled = false;
+      btn.textContent = 'Repetir a pausa';
+      after.hidden = false;
+      postHeight();
+    }
+    inhale();
+  }
+
+  /* ---------- render e eventos ---------- */
+  function partLabel(s) {
+    if (s.t === 'intro') return '';
+    if (s.t === 'q' && s.part === 1) return 'Parte 1 de 3 · Como está a sua conversa agora · Pergunta ' + s.n + ' de ' + s.total;
+    if (s.t === 'gauge') return 'Parte 1 de 3 · Resultado';
+    if (s.t === 'q' && s.part === 2) return 'Parte 2 de 3 · O que move a sua escolha · Pergunta ' + s.n + ' de ' + s.total;
+    if (s.t === 'motiv') return 'Parte 2 de 3 · Resultado';
+    return 'Parte 3 de 3 · O que fazer agora';
+  }
+
+  function render() {
+    clearBreath();
+    var s = steps[state.step];
+    var html;
+    if (s.t === 'intro') html = introHTML();
+    else if (s.t === 'q') html = qHTML(s);
+    else if (s.t === 'gauge') html = gaugeHTML();
+    else if (s.t === 'motiv') html = motivHTML();
+    else if (s.t === 'combo') html = comboHTML();
+    else if (s.t === 'pause') html = pauseHTML();
+    else if (s.t === 'bridge') html = bridgeHTML();
+    else html = cardHTML();
+    app.innerHTML = html;
+    bind(s);
+
+    var pct = Math.round(state.step / (steps.length - 1) * 100);
+    barEl.style.width = pct + '%';
+    progEl.setAttribute('aria-valuenow', String(pct));
+    partEl.textContent = partLabel(s);
+
+    var f = app.querySelector('[data-focus]');
+    if (f) { try { f.focus({ preventScroll: true }); } catch (e) { f.focus(); } }
+    postHeight();
+  }
+
+  function go(n) {
+    state.step = Math.min(Math.max(n, 0), steps.length - 1);
+    save();
+    render();
+    postTop();
+  }
+
+  function bind(s) {
+    var back = $('#back'), next = $('#next');
+    if (back) back.onclick = function () { go(state.step - 1); };
+    if (next) next.onclick = function () { go(state.step + 1); };
+
+    if (s.t === 'intro' && resumeAt > 0) {
+      $('#resume').onclick = function () { var n = resumeAt; resumeAt = 0; go(n); };
+      $('#fresh').onclick = function () { resetAll(); render(); };
+    }
+
+    if (s.t === 'q') {
+      var radios = app.querySelectorAll('input[name="q"]');
+      Array.prototype.forEach.call(radios, function (r) {
+        r.addEventListener('change', function () {
+          state.ans[s.item.id] = +r.value;
+          save();
+          if (next) next.disabled = false;
+        });
+      });
+    }
+
+    if (s.t === 'pause') {
+      $('#bstart').onclick = startBreath;
+      Array.prototype.forEach.call(app.querySelectorAll('input[name="pz"]'), function (r) {
+        r.addEventListener('change', function () { state.pause = r.value; save(); });
+      });
+    }
+
+    if (s.t === 'bridge') {
+      Array.prototype.forEach.call(app.querySelectorAll('input[name="bq"]'), function (r) {
+        r.addEventListener('change', function () { state.bridgeQ = r.value; save(); });
+      });
+      $('#bt').addEventListener('input', function (e) { state.bridgeText = e.target.value; save(); });
+      save();
+    }
+
+    if (s.t === 'card') {
+      Array.prototype.forEach.call(app.querySelectorAll('input[data-task]'), function (c) {
+        c.addEventListener('change', function () { state.tasks[+c.getAttribute('data-task')] = c.checked; save(); });
+      });
+      $('#print').onclick = function () { window.print(); };
+      $('#restart').onclick = function () { resetAll(); render(); postTop(); };
+      $('#copy').onclick = function () {
+        var txt = summaryText(), toast = $('#toast');
+        function ok() { toast.textContent = 'Resumo copiado.'; }
+        function fail() { toast.textContent = 'Não foi possível copiar. Selecione o texto do resumo e copie manualmente.'; }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(txt).then(ok, function () { legacyCopy(txt) ? ok() : fail(); });
+        } else {
+          legacyCopy(txt) ? ok() : fail();
+        }
+      };
+    }
+  }
+
+  function legacyCopy(txt) {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = txt; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      var okk = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return okk;
+    } catch (e) { return false; }
+  }
+
+  document.addEventListener('keydown', function (e) {
+    var s = steps[state.step];
+    if (!s || s.t !== 'q') return;
+    var tag = (e.target && e.target.tagName) || '';
+    if (tag === 'TEXTAREA' || tag === 'INPUT' && e.target.type === 'text') return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.key >= '1' && e.key <= '4') {
+      var r = app.querySelector('input[name="q"][value="' + (+e.key - 1) + '"]');
+      if (r) { r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); }
+    }
+  });
+
+  /* ---------- início ---------- */
+  load();
+  render();
+
+  if (window.ResizeObserver) {
+    new ResizeObserver(function () { postHeight(); }).observe(document.body);
+  } else {
+    window.addEventListener('resize', postHeight);
+  }
+  window.addEventListener('load', postHeight);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(postHeight);
+})();
+</script>
+</body>
+</html>
